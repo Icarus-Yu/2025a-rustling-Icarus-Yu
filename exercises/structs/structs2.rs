@@ -5,7 +5,6 @@
 // Execute `rustlings hint structs2` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
 #[derive(Debug)]
 struct Order {
@@ -17,7 +16,7 @@ struct Order {
     item_number: u32,
     count: u32,
 }
-
+//创建实体的函数，返回值为order，无参函数
 fn create_order_template() -> Order {
     Order {
         name: String::from("Bob"),
@@ -36,9 +35,14 @@ mod tests {
 
     #[test]
     fn your_order() {
+        //调用create_order_template函数，返回一个order实体
         let order_template = create_order_template();
         // TODO: Create your own order using the update syntax and template above!
-        // let your_order =
+         let your_order =Order{
+            name: String::from("Hacker in Rust"),
+            count: 1,
+            ..order_template
+         };
         assert_eq!(your_order.name, "Hacker in Rust");
         assert_eq!(your_order.year, order_template.year);
         assert_eq!(your_order.made_by_phone, order_template.made_by_phone);
