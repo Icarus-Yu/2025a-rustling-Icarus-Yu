@@ -7,14 +7,21 @@
 // Execute `rustlings hint traits1` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+
 
 trait AppendBar {
     fn append_bar(self) -> Self;
 }
 
 impl AppendBar for String {
+     fn append_bar(self) -> Self
+      {
+        // String 类型的 `+` 操作符会消耗掉左边的 String (self)，
+        // 然后连接右边的 &str，最后返回一个新的 String。
+        // 这完美地匹配了我们的方法签名。
+        self + "Bar"
     // TODO: Implement `AppendBar` for type `String`.
+    }
 }
 
 fn main() {
