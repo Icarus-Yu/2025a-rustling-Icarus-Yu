@@ -2,7 +2,7 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -69,15 +69,7 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
-	}
+	
 }
 
 impl<T> Display for LinkedList<T>
@@ -170,4 +162,67 @@ mod tests {
 			assert_eq!(target_vec[i],*list_c.get(i as i32).unwrap());
 		}
 	}
+}
+
+impl<T: PartialOrd + Display> LinkedList<T> {
+    pub fn merge(mut list_a: LinkedList<T>, mut list_b: LinkedList<T>) -> Self {
+        // 处理其中一个或两个链表为空的边界情况
+        if list_a.start.is_none() {
+            return list_b;
+        }
+        if list_b.start.is_none() {
+            return list_a;
+        }
+
+        let mut merged_list = LinkedList::new();
+        let mut current_a = list_a.start;
+        let mut current_b = list_b.start;
+
+        // 在 unsafe 块中进行指针操作
+        unsafe {
+            // 1. 确定合并后链表的头结点
+            let head;
+            if (*current_a.unwrap().as_ptr()).val <= (*current_b.unwrap().as_ptr()).val {
+                head = current_a;
+                current_a = (*head.unwrap().as_ptr()).next;
+            } else {
+                head = current_b;
+                current_b = (*head.unwrap().as_ptr()).next;
+            }
+            merged_list.start = head;
+            let mut tail = head; // tail 指向新链表的尾部
+
+            // 2. 循环比较并链接节点
+            while let (Some(ptr_a), Some(ptr_b)) = (current_a, current_b) {
+                if (*ptr_a.as_ptr()).val <= (*ptr_b.as_ptr()).val {
+                    (*tail.unwrap().as_ptr()).next = Some(ptr_a);
+                    tail = Some(ptr_a);
+                    current_a = (*ptr_a.as_ptr()).next;
+                } else {
+                    (*tail.unwrap().as_ptr()).next = Some(ptr_b);
+                    tail = Some(ptr_b);
+                    current_b = (*ptr_b.as_ptr()).next;
+                }
+            }
+
+            // 3. 链接剩余的节点
+            if let Some(ptr) = current_a {
+                (*tail.unwrap().as_ptr()).next = Some(ptr);
+                merged_list.end = list_a.end;
+            } else if let Some(ptr) = current_b {
+                (*tail.unwrap().as_ptr()).next = Some(ptr);
+                merged_list.end = list_b.end;
+            }
+
+            // 4. 清空旧链表的指针，防止内存被重复释放
+            list_a.start = None;
+            list_a.end = None;
+            list_b.start = None;
+            list_b.end = None;
+        }
+
+        // 5. 更新新链表的长度
+        merged_list.length = list_a.length + list_b.length;
+        merged_list
+    }
 }

@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -36,8 +36,21 @@ where
         self.len() == 0
     }
 
-    pub fn add(&mut self, value: T) {
-        //TODO
+   pub fn add(&mut self, value: T) {
+        self.count += 1;
+        self.items.push(value);
+        
+        // Heapify Up (上浮)
+        let mut idx = self.count;
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                self.items.swap(idx, parent_idx);
+                idx = parent_idx;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -56,9 +69,21 @@ where
         self.left_child_idx(idx) + 1
     }
 
-    fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+     fn smallest_child_idx(&self, idx: usize) -> usize {
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+
+        if right_idx > self.count {
+            // 没有右子节点，只能是左子节点
+            left_idx
+        } else {
+            // 比较左右子节点的优先级
+            if (self.comparator)(&self.items[left_idx], &self.items[right_idx]) {
+                left_idx
+            } else {
+                right_idx
+            }
+        }
     }
 }
 
@@ -83,9 +108,33 @@ where
 {
     type Item = T;
 
-    fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+     fn next(&mut self) -> Option<T> {
+        if self.count == 0 {
+            return None;
+        }
+
+        // 将堆顶与最后一个元素交换
+        self.items.swap(1, self.count);
+        // 弹出（原堆顶）元素，并减少计数
+        let item_to_return = self.items.pop();
+        self.count -= 1;
+
+        if self.count > 0 {
+            // Heapify Down (下沉)
+            let mut idx = 1;
+            while self.children_present(idx) {
+                let child_idx = self.smallest_child_idx(idx);
+                // 如果子节点的优先级更高，则交换
+                if (self.comparator)(&self.items[child_idx], &self.items[idx]) {
+                    self.items.swap(idx, child_idx);
+                    idx = child_idx;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        item_to_return
     }
 }
 
