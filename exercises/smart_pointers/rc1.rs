@@ -10,7 +10,6 @@
 //
 // Execute `rustlings hint rc1` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
 
 use std::rc::Rc;
 
@@ -36,9 +35,11 @@ impl Planet {
 }
 
 fn main() {
+    // 创建一个 Rc 指针指向 Sun，此时引用计数为 1
     let sun = Rc::new(Sun {});
     println!("reference count = {}", Rc::strong_count(&sun)); // 1 reference
 
+    // 每次 clone 都会使引用计数 +1
     let mercury = Planet::Mercury(Rc::clone(&sun));
     println!("reference count = {}", Rc::strong_count(&sun)); // 2 references
     mercury.details();
@@ -59,23 +60,24 @@ fn main() {
     println!("reference count = {}", Rc::strong_count(&sun)); // 6 references
     jupiter.details();
 
-    // TODO
-    let saturn = Planet::Saturn(Rc::new(Sun {}));
+    // TODO: 修正这里，使用 Rc::clone 来共享同一个 sun
+    let saturn = Planet::Saturn(Rc::clone(&sun));
     println!("reference count = {}", Rc::strong_count(&sun)); // 7 references
     saturn.details();
 
-    // TODO
-    let uranus = Planet::Uranus(Rc::new(Sun {}));
+    // TODO: 修正这里
+    let uranus = Planet::Uranus(Rc::clone(&sun));
     println!("reference count = {}", Rc::strong_count(&sun)); // 8 references
     uranus.details();
 
-    // TODO
-    let neptune = Planet::Neptune(Rc::new(Sun {}));
+    // TODO: 修正这里
+    let neptune = Planet::Neptune(Rc::clone(&sun));
     println!("reference count = {}", Rc::strong_count(&sun)); // 9 references
     neptune.details();
 
     assert_eq!(Rc::strong_count(&sun), 9);
 
+    // 每 drop 一个持有 Rc 指针的变量，引用计数会 -1
     drop(neptune);
     println!("reference count = {}", Rc::strong_count(&sun)); // 8 references
 
@@ -91,13 +93,16 @@ fn main() {
     drop(mars);
     println!("reference count = {}", Rc::strong_count(&sun)); // 4 references
 
-    // TODO
+    // TODO: 补全这里的 drop 调用
+    drop(earth);
     println!("reference count = {}", Rc::strong_count(&sun)); // 3 references
 
-    // TODO
+    // TODO: 补全这里的 drop 调用
+    drop(venus);
     println!("reference count = {}", Rc::strong_count(&sun)); // 2 references
 
-    // TODO
+    // TODO: 补全这里的 drop 调用
+    drop(mercury);
     println!("reference count = {}", Rc::strong_count(&sun)); // 1 reference
 
     assert_eq!(Rc::strong_count(&sun), 1);
